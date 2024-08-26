@@ -2,6 +2,10 @@
 
 Task App is a full-stack application for managing tasks, allowing users to create, update, delete, and view tasks. The application is built using Node.js for the backend and Next.js for the frontend, ensuring a seamless and dynamic user experience.
 
+## Login Page
+![image](https://github.com/user-attachments/assets/b7c5ab27-58fa-436a-8507-f91d2dac4fb7)
+
+
 ## Features
 
 - **Create Tasks**: Add new tasks with details such as title, description, due date, priority, and location reminders.
