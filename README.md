@@ -5,6 +5,15 @@ Task App is a full-stack application for managing tasks, allowing users to creat
 ## Login Page
 ![image](https://github.com/user-attachments/assets/b7c5ab27-58fa-436a-8507-f91d2dac4fb7)
 
+## Home Page 
+![image](https://github.com/user-attachments/assets/9e1386c1-f643-4c23-ae2f-b8504c014ac9)
+
+## Add / Edit Page
+![image](https://github.com/user-attachments/assets/5d45afbf-f520-4df1-b582-4c668841102f)
+
+## Dashboard Page
+![image](https://github.com/user-attachments/assets/653a134b-c825-4259-8c62-260714226768)
+
 
 ## Features
 
@@ -98,17 +107,17 @@ Task App is a full-stack application for managing tasks, allowing users to creat
 
 task-app/
 ├── be/
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── utils/
-│ ├── .env
-│ ├── server.js
-│ └── package.json
+   │ ├── controllers/
+   │ ├── models/
+   │ ├── routes/
+   │ ├── utils/
+   │ ├── .env
+   │ ├── server.js
+   │ └── package.json
 └── fe/
-├── components/
-├── pages/
-├── styles/
-├── .env.local
-├── next.config.js
-└── package.json
+   ├── components/
+   ├── pages/
+   ├── styles/
+   ├── .env.local
+   ├── next.config.js
+   └── package.json
