@@ -12,12 +12,36 @@ import {
 import PriorityBadge from "./priority-badge";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { toggleTaskCompletion } from "@/redux/slices/task-slice";
+import axios from "axios";
+import moment from "moment";
 
-export function TaskActionCard({ className, selectedTask }) {
+export function TaskActionCard({ className, selectedTask, setTask }) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const handleCheckedChange = async (id, status) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
+        status: !status,
+      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`
+      );
+      setTask(res.data);
+    } catch (err) {
+      console.error("Failed to fetch tasks:", err);
+    }
+  };
+
+  const handleDeleteButton = async (id) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`);
+    } catch (err) {
+      console.error("Failed to delete the task");
+    }
+  };
+
+  const momentDate = (date) => {
+    return moment(date).format("MM/DD/YYYY");
+  };
 
   return (
     <Card className={className}>
@@ -37,6 +61,7 @@ export function TaskActionCard({ className, selectedTask }) {
             variant="ghost"
             className="text-red-400 hover:text-red-400"
             size="sm"
+            onClick={() => handleDeleteButton(selectedTask?.id)}
           >
             <Trash2 size={20} />
           </Button>
@@ -55,9 +80,9 @@ export function TaskActionCard({ className, selectedTask }) {
             </p>
           </div>
           <Switch
-            defaultChecked={selectedTask?.isCompleted}
+            defaultChecked={selectedTask?.status}
             onCheckedChange={() =>
-              dispatch(toggleTaskCompletion(selectedTask.id))
+              handleCheckedChange(selectedTask.id, selectedTask.status)
             }
           />
         </div>
@@ -68,7 +93,7 @@ export function TaskActionCard({ className, selectedTask }) {
             <CalendarCheck2 size={18} className="text-yellow-600" />
             <div className="space-y-1">
               <p className="text-sm font-medium leading-none">
-                {selectedTask?.due_date}
+                {momentDate(selectedTask?.dueDate)}
               </p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Due Date

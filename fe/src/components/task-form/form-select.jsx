@@ -21,6 +21,7 @@ const FormSelect = ({
   label,
   error,
   options,
+  value,
 }) => {
   return (
     <FormField
@@ -28,13 +29,16 @@ const FormSelect = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className='dark:text-neutral-300'>{label}</FormLabel>
+          <FormLabel className="dark:text-neutral-300">{label}</FormLabel>
           <FormControl>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} defaultValue={value}>
               <SelectTrigger className="w-[220px] dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-300 dark:focus:border-blue-300">
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
-              <SelectContent ref={field.ref} className='dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-100 dark:text-white dark:focus:ring-blue-300 dark:focus:border-blue-300'>
+              <SelectContent
+                ref={field.ref}
+                className="dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-100 dark:text-white dark:focus:ring-blue-300 dark:focus:border-blue-300"
+              >
                 {options?.map((option) => (
                   <SelectItem value={option?.value}>{option?.label}</SelectItem>
                 ))}

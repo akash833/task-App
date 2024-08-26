@@ -4,20 +4,40 @@ import TasksModel from "../models/tasks.js";
 const ObjectId = mongoose.Types.ObjectId;
 
 export const createTask = async (taskBody) => {
-  const { title, description, dueDate, priorityLevel } = taskBody;
+  const { title, description, dueDate, priority, location_reminder } = taskBody;
 
   const task = await TasksModel.create({
     title,
+    location_reminder,
     description,
     dueDate,
-    priorityLevel,
+    priority,
   });
   return { id: task._id };
 };
 
-export const getTasks = async () => {
+export const getTasks = async (sort) => {
   try {
-    const tasks = await TasksModel.find().sort({ dueDate: 1 });
+    const tasks = await TasksModel.aggregate([
+      {
+        $project: {
+          id: "$_id",
+          _id: false,
+          title: true,
+          description: true,
+          location_reminder: true,
+          dueDate: true,
+          priority: true,
+          status: true,
+          createdAt: true,
+        },
+      },
+      {
+        $sort: {
+          createdAt: sort === "asc" ? 1 : -1,
+        },
+      },
+    ]);
     return tasks;
   } catch (error) {
     throw new Error("Error fetching tasks");
@@ -47,10 +67,6 @@ export const updateTask = async (id, updateBody) => {
 };
 
 export const deleteTask = async (id) => {
-  if (!ObjectId.isValid(id)) {
-    throw new Error("Invalid task ID");
-  }
-
   const deletedTask = await TasksModel.findByIdAndDelete(id);
   if (!deletedTask) {
     throw new Error("Task not found");

@@ -42,7 +42,7 @@ export function DatePicker({ placeholder, field, setDateForm }) {
           selected={new Date(field?.value) || date}
           onSelect={(date) => {
             setDate(date);
-            setDateForm("due_date", date);
+            setDateForm("dueDate", date);
           }}
           initialFocus
         />

@@ -26,7 +26,11 @@ const FormDatePicker = ({
             {label}
           </FormLabel>
           <FormControl>
-            <DatePicker placeholder={placeholder} field={field} setDateForm={setDate}/>
+            <DatePicker
+              placeholder={placeholder}
+              field={field}
+              setDateForm={setDate}
+            />
           </FormControl>
           <FormDescription className="text-red-500">{error}</FormDescription>
         </FormItem>

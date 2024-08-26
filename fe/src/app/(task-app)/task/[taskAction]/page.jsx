@@ -1,7 +1,8 @@
+"use client";
 import Header from "@/components/layout/Header";
 import { TaskForm } from "@/components/task-form/TaskForm";
-import { TasksArray } from "@/lib/data";
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const page = ({ params }) => {
   const breadcrumbArray = [
@@ -13,10 +14,31 @@ const page = ({ params }) => {
       name: params?.taskAction === "add" ? "Add Task" : "Edit Task",
     },
   ];
+  const [currentTask, setCurrentTask] = useState({});
 
-  const currentTask = TasksArray?.find(
-    (task) => task?.id == params?.taskAction
-  );
+  const getTaskDetails = async (id) => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`
+      );
+      const data = res.data;
+      setCurrentTask({
+        title: data.title,
+        description: data.description,
+        dueDate: new Date(data.dueDate),
+        priority: data.priority,
+        location_reminder: data.location_reminder,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (params?.taskAction !== "add") {
+      getTaskDetails(params.taskAction);
+    }
+  }, []);
 
   return (
     <div className="w-[48rem] text-left p-3">
@@ -25,7 +47,7 @@ const page = ({ params }) => {
         pageTitle={params?.taskAction === "add" ? "Add Task" : "Edit Task"}
       />
 
-      <TaskForm defaultValue={currentTask} taskAction={params?.taskAction}/>
+      <TaskForm defaultValue={currentTask} taskAction={params?.taskAction} />
     </div>
   );
 };

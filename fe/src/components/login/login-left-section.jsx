@@ -17,7 +17,7 @@ const LoginLeftSection = () => {
           height={80}
           width={80}
         />
-        Lens Task Manager
+        DDREG Task Manager
       </Link>
 
       <div className="list-features pl-12">

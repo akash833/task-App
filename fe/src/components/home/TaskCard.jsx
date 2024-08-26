@@ -1,9 +1,8 @@
 "use client";
 import { BsListTask } from "react-icons/bs";
-import React from "react";
+import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "../ui/checkbox";
-
 import {
   Tooltip,
   TooltipContent,
@@ -13,11 +12,21 @@ import {
 import CustomDropdownMenu from "./dropdown-menu";
 import Link from "next/link";
 import PriorityBadge from "../task-details/priority-badge";
-import { useDispatch } from "react-redux";
-import { toggleTaskCompletion } from "@/redux/slices/task-slice";
+import moment from "moment";
+import axios from "axios";
 
-const TaskCard = ({ task }) => {
-  const dispatch = useDispatch();
+const TaskCard = ({ task, setTasks }) => {
+  const handleCheckedChange = async (id, status) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
+        status: !status,
+      });
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tasks`);
+      setTasks(res.data);
+    } catch (err) {
+      console.error("Failed to fetch tasks:", err);
+    }
+  };
 
   return (
     <div className="mt-3 max-w-full p-4 bg-white hover:bg-blue-100 border border-blue-200 hover:border-blue-400 rounded-lg shadow dark:bg-gray-700 dark:border-gray-500 cursor-pointer dark:hover:border-gray-300">
@@ -33,7 +42,7 @@ const TaskCard = ({ task }) => {
         </div>
 
         {/*Custom Dropdown-menu */}
-        <CustomDropdownMenu task={task} />
+        <CustomDropdownMenu task={task} setTasks={setTasks} />
       </div>
 
       <Separator className="my-1" />
@@ -41,7 +50,7 @@ const TaskCard = ({ task }) => {
       {/* Due date & priority badge */}
       <div className="flex flex-row w-full h-4 my-2">
         <span className="text-xs text-neutral-700 dark:text-neutral-100">
-          Due Date: {task?.due_date}
+          Due Date: {moment(task?.dueDate).format("MM/DD/YYYY")}
         </span>
         <Separator
           orientation="vertical"
@@ -71,8 +80,8 @@ const TaskCard = ({ task }) => {
           <Checkbox
             id="terms"
             className=""
-            defaultChecked={task?.isCompleted || false}
-            onCheckedChange={() => dispatch(toggleTaskCompletion(task.id))}
+            defaultChecked={task?.status || false}
+            onCheckedChange={() => handleCheckedChange(task.id, task?.status)}
           />
           <label
             htmlFor="terms"

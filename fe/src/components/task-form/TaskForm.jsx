@@ -7,9 +7,9 @@ import { Button } from "../ui/button";
 import FormDatePicker from "./form-date-picker";
 import FormSelect from "./form-select";
 import FormInput from "./form-input";
-import { useDispatch, useSelector } from "react-redux";
-import { addTask, editTask } from "@/redux/slices/task-slice";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import axios from "axios";
 import { format } from "date-fns";
 
 // form zod schema
@@ -20,7 +20,7 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "title must be at least 10 characters.",
   }),
-  due_date: z.any(),
+  dueDate: z.any(),
   priority: z.string().min(1, {
     message: "Priority is required",
   }),
@@ -46,47 +46,71 @@ const selectOptions = [
 ];
 
 export function TaskForm({ defaultValue, taskAction }) {
-  const dispatch = useDispatch();
-  const { tasks } = useSelector((state) => state.tasks);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-
   // 1. Define your form.
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValue || {
       title: "",
       description: "",
-      due_date: "",
+      dueDate: "",
       priority: "",
       location_reminder: "",
     },
   });
 
+  // Function to add a new task
+  const addTask = async (taskData) => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/tasks`,
+        taskData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to add task:", error);
+    }
+  };
+
+  // Function to edit an existing task
+  const editTask = async (taskId, taskData) => {
+    try {
+      console.log(taskData, "taskData");
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
+        taskData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to edit task:", error);
+    }
+  };
+
   // 2. Define a submit handler.
-  function onSubmit(values) {
+  const onSubmit = async (values) => {
+    setIsSubmitting(true);
+    const formattedValues = {
+      ...values,
+      dueDate: format(values.dueDate, "yyyy-MM-dd"),
+    };
+
+    console.log("on submitting");
+
     if (taskAction === "add") {
-      // adding task via dispatch add task function
-      dispatch(
-        addTask({
-          ...values,
-          id: tasks?.length + 1001,
-          due_date: format(values?.due_date, "yyyy-MM-dd"),
-        })
-      );
+      // API call to add a new task
+      await addTask(formattedValues);
     } else {
-      // editing task here
-      dispatch(
-        editTask({
-          ...values,
-          id: defaultValue?.id,
-          due_date: format(values?.due_date, "yyyy-MM-dd"),
-        })
-      );
+      console.log("edit action");
+
+      // API call to edit an existing task
+      await editTask(defaultValue?._id, formattedValues);
     }
 
     // successfully redirecting it to home
+    setIsSubmitting(false);
     router.push("/home");
-  }
+  };
 
   const errors = form?.formState?.errors;
 
@@ -95,7 +119,7 @@ export function TaskForm({ defaultValue, taskAction }) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-2 grid-cols-1 gap-2 mb-3">
-            {/* title  */}
+            {/* Title  */}
             <FormInput
               name={"title"}
               placeholder={"Enter title"}
@@ -103,9 +127,10 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Title"}
               type={"text"}
               error={errors?.title?.message}
+              value={defaultValue.title}
             />
 
-            {/* description */}
+            {/* Description */}
             <FormInput
               name={"description"}
               placeholder={"Enter description"}
@@ -113,6 +138,7 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Description"}
               type={"text"}
               error={errors?.description?.message}
+              value={defaultValue.description}
             />
 
             {/* Location Reminder */}
@@ -123,6 +149,7 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Location Reminder"}
               type={"text"}
               error={errors?.location_reminder?.message}
+              value={defaultValue.location_reminder}
             />
 
             {/* Priority */}
@@ -133,21 +160,23 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Priority"}
               error={errors?.priority?.message}
               options={selectOptions}
+              value={defaultValue.priority}
             />
 
             {/* Due Date */}
             <FormDatePicker
-              name={"due_date"}
+              name={"dueDate"}
               placeholder={"Enter Due Date"}
               control={form.control}
               label={"Due Date"}
-              error={errors?.due_date?.message}
+              error={errors?.dueDate?.message}
               setDate={form.setValue}
+              value={defaultValue.dueDate}
             />
           </div>
           <Button
             type="submit"
-            disabled={form.isSubmitting}
+            disabled={isSubmitting}
             className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
           >
             Save

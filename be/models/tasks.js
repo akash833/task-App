@@ -1,14 +1,16 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 const TaskSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   dueDate: { type: Date, required: true },
-  priorityLevel: {
+  location_reminder: String,
+  priority: {
     type: String,
     required: true,
-    enum: ["high", "medium", "low"],
+    enum: ["High", "Medium", "Low"],
   },
+  status: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -6,18 +6,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteTask } from "@/redux/slices/task-slice";
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import axios from "axios";
 
-const CustomDropdownMenu = ({ task }) => {
+const CustomDropdownMenu = ({ task, setTasks }) => {
   const router = useRouter();
-  const dispatch = useDispatch();
 
-  // task delete handler dispatch will be called over here
-  const handleDeleteTask = () => {
-    dispatch(deleteTask(task?.id));
+  const handleDeleteTask = async (id) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tasks`);
+      setTasks(res.data);
+    } catch (err) {
+      console.error("Failed to delete the task");
+    }
   };
 
   return (
@@ -43,7 +46,7 @@ const CustomDropdownMenu = ({ task }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="flex justify-between"
-            onClick={() => handleDeleteTask()}
+            onClick={() => handleDeleteTask(task?.id)}
           >
             <span>Delete</span>
             <span>
