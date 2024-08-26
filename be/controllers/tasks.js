@@ -23,8 +23,8 @@ export const createTaskHandler = async (req, res) => {
 
 export const getTasksHandler = async (req, res) => {
   try {
-    const { sort } = req.query;
-    const tasks = await getTasks(sort);
+    const { sort, search, filter } = req.query;
+    const tasks = await getTasks(sort, search, filter);
     return res.status(200).json(tasks);
   } catch (err) {
     console.error("Error while fetching tasks:", err.message);

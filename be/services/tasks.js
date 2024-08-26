@@ -16,9 +16,34 @@ export const createTask = async (taskBody) => {
   return { id: task._id };
 };
 
-export const getTasks = async (sort) => {
+export const getTasks = async (sort, search, filter) => {
   try {
+    const filterTask = {};
+    if (filter === "Completed") {
+      filterTask["status"] = true;
+    } else if (filter === "Pending") {
+      filterTask["status"] = false;
+    }
     const tasks = await TasksModel.aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              title: {
+                $regex: search ? search : "",
+                $options: "i", // Case-insensitive search
+              },
+            },
+            {
+              description: {
+                $regex: search ? search : "",
+                $options: "i", // Case-insensitive search
+              },
+            },
+          ],
+          ...filterTask,
+        },
+      },
       {
         $project: {
           id: "$_id",

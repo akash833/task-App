@@ -8,7 +8,7 @@ import FormDatePicker from "./form-date-picker";
 import FormSelect from "./form-select";
 import FormInput from "./form-input";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 
@@ -59,6 +59,26 @@ export function TaskForm({ defaultValue, taskAction }) {
       location_reminder: "",
     },
   });
+  const setValue = form.setValue;
+
+  useEffect(() => {
+    if (taskAction !== "add") {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskAction}`)
+        .then((response) => {
+          const { title, description, dueDate, priority, location_reminder } =
+            response.data;
+          setValue("title", title);
+          setValue("description", description);
+          setValue("dueDate", format(dueDate, "yyyy-MM-dd"));
+          setValue("priority", priority);
+          setValue("location_reminder", location_reminder);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch task:", error);
+        });
+    }
+  }, [taskAction, setValue]);
 
   // Function to add a new task
   const addTask = async (taskData) => {
@@ -76,7 +96,6 @@ export function TaskForm({ defaultValue, taskAction }) {
   // Function to edit an existing task
   const editTask = async (taskId, taskData) => {
     try {
-      console.log(taskData, "taskData");
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
         taskData
@@ -95,16 +114,11 @@ export function TaskForm({ defaultValue, taskAction }) {
       dueDate: format(values.dueDate, "yyyy-MM-dd"),
     };
 
-    console.log("on submitting");
-
     if (taskAction === "add") {
       // API call to add a new task
       await addTask(formattedValues);
     } else {
-      console.log("edit action");
-
-      // API call to edit an existing task
-      await editTask(defaultValue?._id, formattedValues);
+      await editTask(taskAction, formattedValues);
     }
 
     // successfully redirecting it to home
@@ -119,18 +133,17 @@ export function TaskForm({ defaultValue, taskAction }) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-2 grid-cols-1 gap-2 mb-3">
-            {/* Title  */}
+            {/* title  */}
             <FormInput
-              name={"title"}
+              name="title"
               placeholder={"Enter title"}
               control={form.control}
               label={"Title"}
               type={"text"}
               error={errors?.title?.message}
-              value={defaultValue.title}
             />
 
-            {/* Description */}
+            {/* description */}
             <FormInput
               name={"description"}
               placeholder={"Enter description"}
@@ -138,7 +151,6 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Description"}
               type={"text"}
               error={errors?.description?.message}
-              value={defaultValue.description}
             />
 
             {/* Location Reminder */}
@@ -149,7 +161,6 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Location Reminder"}
               type={"text"}
               error={errors?.location_reminder?.message}
-              value={defaultValue.location_reminder}
             />
 
             {/* Priority */}
@@ -160,7 +171,6 @@ export function TaskForm({ defaultValue, taskAction }) {
               label={"Priority"}
               error={errors?.priority?.message}
               options={selectOptions}
-              value={defaultValue.priority}
             />
 
             {/* Due Date */}
@@ -169,14 +179,13 @@ export function TaskForm({ defaultValue, taskAction }) {
               placeholder={"Enter Due Date"}
               control={form.control}
               label={"Due Date"}
-              error={errors?.dueDate?.message}
+              error={errors?.due_date?.message}
               setDate={form.setValue}
-              value={defaultValue.dueDate}
             />
           </div>
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={form.isSubmitting}
             className="dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
           >
             Save

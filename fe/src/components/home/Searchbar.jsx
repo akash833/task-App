@@ -1,9 +1,15 @@
-import React from "react";
+import { useState } from "react";
 
-const Searchbar = () => {
+const Searchbar = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    onSearch(event.target.value);
+  };
   return (
     <div>
-      <div className="relative w-full">
+      <div className="relative w-[170%]">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg
             className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -25,8 +31,10 @@ const Searchbar = () => {
           type="text"
           id="simple-search"
           className="bg-gray-50 border border-gray-300  text-gray-900 text-sm rounded-lg focus:ring-blue-200 focus:border-blue-200 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-300 dark:focus:border-blue-300"
-          placeholder="Search Tasks by name ..."
+          placeholder="Search Tasks by title or description ..."
           required
+          onChange={handleSearchChange}
+          value={searchQuery}
         />
       </div>
     </div>

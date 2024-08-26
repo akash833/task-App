@@ -30,7 +30,7 @@ const page = ({ params }) => {
         location_reminder: data.location_reminder,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 

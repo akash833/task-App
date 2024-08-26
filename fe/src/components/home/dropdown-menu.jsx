@@ -6,6 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GrActions } from "react-icons/gr";
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -30,7 +31,9 @@ const CustomDropdownMenu = ({ task, setTasks }) => {
           <EllipsisVertical size={15} className="dark:text-neutral-300" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>⌘ Task Actions</DropdownMenuLabel>
+          <DropdownMenuLabel className="flex items-center">
+            <GrActions className="mr-2" /> Task Actions
+          </DropdownMenuLabel>
           <DropdownMenuSeparator className="border border-neutral-300 dark:border-neutral-500" />
           <DropdownMenuItem
             className="flex justify-between"
